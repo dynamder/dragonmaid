@@ -11,3 +11,6 @@
 /build/*
 /dist/*
 /32-bit-dist/*
+/dist.zip
+/32-bit-dist.zip
+/source_code.zip
