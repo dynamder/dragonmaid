@@ -1,4 +1,5 @@
 #################################################################
+#a simple desktop pet program using tkinter
 #created by dynamder
 #version:1.0.1
 #date:2022.4.24

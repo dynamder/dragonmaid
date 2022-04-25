@@ -114,14 +114,17 @@ class Maid(DragWindow): #the maid showed on your screen
         self.root.attributes("-toolwindow", True)  # 置为工具窗口(没有最大最小按钮)
         self.root.attributes("-topmost", True)  # 永远处于顶层
         self.root.overrideredirect(True)  # 去除边框
-        self.root.attributes("-transparentcolor", "white")
-
-
-
+        self.root.geometry(f"{self.size_show_width}x{self.size_show_height}")
+        #self.root.configure(bg="none")
+        self.root.attributes("-transparentcolor", "gray")
+        """self.bg_canvas=tk.Canvas(self.root,width=self.size_show_width,height=self.size_show_height,bd=0,highlightthickness=0)
+        self.bg_image=Image.open('completely_transparent.png')
+        self.bg_image_show=ImageTk.PhotoImage(self.bg_image.resize((self.size_show_width,self.size_show_height),Image.ANTIALIAS))
+        self.bg_canvas.pack()"""
 
         self.picture = Image.open(self.picturename)
         self.picuture_show_png = ImageTk.PhotoImage(self.picture.resize((self.size_show_width,self.size_show_height),Image.ANTIALIAS))  # .resize((int(size_show_width), int(size_show_height)), resample=Image.ANTIALIAS)
-        canvas1 = tk.Canvas(self.root, width=self.picture.width, height=self.picture.height, bg="white")
+        canvas1 = tk.Canvas(self.root, width=self.picture.width, height=self.picture.height, bg="gray")
         canvas1.config(highlightthickness=0)
         canvas1.create_image(0, 0, image=self.picuture_show_png, anchor="nw")
         # canvas1.create_image(dragonmaid.width, 0, image=dm_png, anchor="nw")
@@ -185,7 +188,7 @@ class Maid(DragWindow): #the maid showed on your screen
             self.size_show_width=int(value)
         elif name=='mate_show_height':
             self.size_show_height=int(value)
-        elif name=='mate_min_width':
+        elif name   =='mate_min_width':
             self.min_width=int(value)
         elif name=='mate_min_height':
             self.min_height=int(value)
@@ -224,7 +227,7 @@ class Maid_greet: # the greet picture shown when the program start
         self.root.wm_attributes("-toolwindow", True)  # 置为工具窗口(没有最大最小按钮)
         self.root.wm_attributes("-topmost", True)  # 永远处于顶层
 
-        self.width, self.height = 600, 450
+        self.width, self.height = scx//2, scy//2
         self.place_x = scx // 3
         self.place_y = scy // 4  # 位置以屏幕左上角为起始点(0,0)
         self.root.geometry(f'{self.width}x{self.height}+{self.place_x}+{self.place_y}')
@@ -235,7 +238,7 @@ class Maid_greet: # the greet picture shown when the program start
 
     def show(self):
         self.img_open = Image.open(self.picture)
-        self.img_png = ImageTk.PhotoImage(self.img_open)
+        self.img_png = ImageTk.PhotoImage(self.img_open.resize((self.width,self.height),Image.ANTIALIAS))
         self.label_img = tk.Label(self.root, image=self.img_png)
         self.label_img.pack()
         self.root.after(4000, self.root.withdraw)
