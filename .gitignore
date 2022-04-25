@@ -2,9 +2,11 @@
 /shelf/
 /workspace.xml
 
-/pictures/
+/pictures/*
 /configs/*
 !/configs/example/
-/_pycache_/
+/_pycache_/*
 /*.spec
-/build/
+/build/*
+/dist/*
+/32-bit-dist/*
