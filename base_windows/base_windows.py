@@ -54,18 +54,23 @@ class Popwindow: # as the name implies
         self.dialog=tk.Toplevel()
         self.width=width
         self.height=height
+        self.dialog.geometry(f"{self.width}x{self.height}")
+        self.dialog.update()
         self.root.bind("<Configure>",self.sync_windows)# when the window is changed in position or size(here is position), sync the window
         self.diapic = Image.open(picture)
         self.diapic_sh = ImageTk.PhotoImage(self.diapic.resize((width, height), Image.ANTIALIAS))
-        self.canvas = tk.Canvas(self.dialog, width=self.diapic.width, height=self.diapic.height, bg="white")
+        self.canvas = tk.Canvas(self.dialog, width=self.diapic.width, height=self.diapic.height, bg="gray")
         self.canvas.config(highlightthickness=0)
         self.sync_x=sync_x
         self.sync_y=sync_y
+        print("sync_y:",sync_y)
         self.interval=interval
 
     def sync_windows(self,event):
-        x = self.root.winfo_x() + self.root.winfo_width() + self.sync_x
-        y = self.root.winfo_y()+self.sync_y
+        #x = self.root.winfo_x() + self.root.winfo_width() + self.sync_x
+        #y = self.root.winfo_y()+self.sync_y
+        x = self.root.winfo_x() -self.sync_x
+        y = self.root.winfo_y()-self.sync_y
         self.dialog.geometry("+%d+%d" % (x, y))
 
     def show(self):
@@ -73,7 +78,7 @@ class Popwindow: # as the name implies
         self.dialog.attributes("-toolwindow", True)  # 置为工具窗口(没有最大最小按钮)
         self.dialog.attributes("-topmost", True)  # 永远处于顶层
         self.dialog.overrideredirect(True)  # 去除边框
-        self.dialog.attributes("-transparentcolor", "white")
+        self.dialog.attributes("-transparentcolor", "gray")
 
         self.canvas.create_image(0, 0, image=self.diapic_sh, anchor="nw")
         self.canvas.pack()

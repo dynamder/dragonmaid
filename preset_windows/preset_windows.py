@@ -24,24 +24,33 @@ class Chatbubble(Popwindow): #maid will talk through this way, a subclass of Pop
                 line2=line1.replace(';','\n')
                 self.words.append(line2)
         self.is_chatting=False
+        self.sync_x=self.dialog.winfo_width()-sync_x
+        self.sync_y=self.root.winfo_height()//3-self.dialog.winfo_height()+sync_y
 
     def sync_windows(self,event): #keep the relative position between the chatbubble and the maid
-        x = self.root.winfo_x() - self.root.winfo_width()//3 - self.sync_x
-        y = self.root.winfo_y() + self.sync_y
+        # x = self.root.winfo_x() + self.root.winfo_width() + self.sync_x
+        # y = self.root.winfo_y()+self.sync_y
+        x = self.root.winfo_x() - self.sync_x
+        y = self.root.winfo_y() +self.sync_y
+        #self.dialog.geometry("+%d+%d" % (x, y))
 
         self.dialog.geometry("+%d+%d" % (x, y))
 
 
     def chat(self,event): #showing the bubbles and the words
-        self.text=self.words[random.randint(1, len(self.words)-1)]
+        selec=random.randint(1, len(self.words)-1)
+        self.text=self.words[selec]
         if self.is_chatting: #if a chatbubble exists, return
             return
 
         print("chat")
         #show the bubbles
-        x = self.root.winfo_x() + self.root.winfo_width()//3 + self.sync_x
-        y = self.root.winfo_y() -self.sync_y
+        x = self.root.winfo_x() - self.sync_x
+        y = self.root.winfo_y() + self.sync_y
+        # self.dialog.geometry("+%d+%d" % (x, y))
+
         self.dialog.geometry("+%d+%d" % (x, y))
+        self.dialog.update()
         self.show()
         #show the text
         self.text_show=self.canvas.create_text(30,30,text=self.text,font=("等线",11),anchor="nw")
@@ -49,10 +58,6 @@ class Chatbubble(Popwindow): #maid will talk through this way, a subclass of Pop
         self.dialog.deiconify()
 
         #sync the windows as the self.sync_window() is used as a callback function
-        x = self.root.winfo_x() - self.root.winfo_width() // 3 - self.sync_x
-        y = self.root.winfo_y() + self.sync_y
-
-        self.dialog.geometry("+%d+%d" % (x, y))
 
 
         self.flip_state() #the state is turned to being shown
@@ -85,11 +90,11 @@ class Min_maid(DragWindow): #the maid cannot interact with you in this mode
         self.mini.attributes("-toolwindow", True)  # 置为工具窗口(没有最大最小按钮)
         self.mini.attributes("-topmost", True)  # 永远处于顶层
         self.mini.overrideredirect(True)  # 去除边框
-        self.mini.attributes("-transparentcolor", "white")
+        self.mini.attributes("-transparentcolor", "gray")
 
         self.picture=picture
 
-        self.bt=Return_button(self.mini,self.father.root,picture=self.picture,text='呼唤',width=250,height=150)# once the button activated, the interactive maid will reshow
+        self.bt=Return_button(self.mini,self.father.root,picture=self.picture,text='call',width=250,height=150)# once the button activated, the interactive maid will reshow
         self.bt.activate()
         #self.bt=tk.Button(self.mini,width=300,height=150,text="呼唤",image=self.minipic_sh,command=self.calling)
         #self.bt.pack()
@@ -117,6 +122,7 @@ class Maid(DragWindow): #the maid showed on your screen
         self.root.geometry(f"{self.size_show_width}x{self.size_show_height}")
         #self.root.configure(bg="none")
         self.root.attributes("-transparentcolor", "gray")
+        self.root.update()
         """self.bg_canvas=tk.Canvas(self.root,width=self.size_show_width,height=self.size_show_height,bd=0,highlightthickness=0)
         self.bg_image=Image.open('completely_transparent.png')
         self.bg_image_show=ImageTk.PhotoImage(self.bg_image.resize((self.size_show_width,self.size_show_height),Image.ANTIALIAS))
@@ -129,14 +135,15 @@ class Maid(DragWindow): #the maid showed on your screen
         canvas1.create_image(0, 0, image=self.picuture_show_png, anchor="nw")
         # canvas1.create_image(dragonmaid.width, 0, image=dm_png, anchor="nw")
         canvas1.pack()
-
-        self.chatting = Chatbubble(self.root, self.chatpicturename,self.mate_sets)#the chatting instance
+        self.sync_x=self.sync_x*self.size_show_width//self.sync_x_ref
+        self.sync_y = self.sync_y * self.size_show_height // self.sync_y_ref
+        self.chatting = Chatbubble(self.root, self.chatpicturename,self.mate_sets,sync_x=self.sync_x,sync_y=self.sync_y,width=self.bubble_width,height=self.bubble_height)#the chatting instance
         self.minshape=Min_maid(self,self.minname,self.min_width,self.min_height)#the uninteractive mode
 
 
         self.root.bind('<Button-1>',self.chatting.chat)
 
-        self.mmenu=Rc_menu(picture=self.menuname,root=self.root,work_func=self.event_minimize,exec_func=self.exec_scripts,rest_func=self.quit,width=self.menu_width,height=self.menu_height)
+        self.mmenu=Rc_menu(picture=self.menuname,root=self.root,work_func=self.event_minimize,exec_func=self.exec_scripts,rest_func=self.quit,width=self.menu_width,height=self.menu_height,work_text=self.menu_command_work,exec_text=self.menu_command_exec,rest_text=self.menu_command_rest,cascade_text=self.menu_cascade)
         #the menu will show when right clicked
 
 
@@ -196,8 +203,26 @@ class Maid(DragWindow): #the maid showed on your screen
             self.menu_width=int(value)
         elif name=='mate_menu_height':
             self.menu_height=int(value)
-
-
+        elif name=='mate_bubble_width':
+            self.bubble_width=int(value)
+        elif name=='mate_bubble_height':
+            self.bubble_height=int(value)
+        elif name=='sync_x':
+            self.sync_x=int(value)
+        elif name=='sync_y':
+            self.sync_y=int(value)
+        elif name=='sync_x_ref':
+            self.sync_x_ref=int(value)
+        elif name=='sync_y_ref':
+            self.sync_y_ref=int(value)
+        elif name=='menu_cascade':
+            self.menu_cascade=value
+        elif name=='menu_command_work':
+            self.menu_command_work=value
+        elif name=='menu_command_exec':
+            self.menu_command_exec=value
+        elif name=='menu_command_rest':
+            self.menu_command_rest=value
 
     def read_config(self):
         with open(r'./config.ini', encoding='utf-8') as config:
